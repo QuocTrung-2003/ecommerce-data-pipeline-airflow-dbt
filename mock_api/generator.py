@@ -56,6 +56,8 @@ class DataStore:
     def _generate(self):
 
         # ---------------- PRODUCTS ----------------
+
+
         for p in PRODUCTS:
             self.products.append({
                 "product_id": str(uuid.uuid4()),
@@ -66,7 +68,9 @@ class DataStore:
                 "updated_at": datetime.now(timezone.utc).isoformat()  
             })
 
-            # ---------------- CUSTOMERS ----------------
+        # ---------------- CUSTOMERS ----------------
+
+
         for i in range(1000):
             cid = str(uuid.uuid4())
             signup = _rand_date(360)
@@ -86,7 +90,8 @@ class DataStore:
             })
             
 
-            # ---------------- ORDERS + ORDER ITEMS ----------------
+        # ---------------- ORDERS + ORDER ITEMS ----------------
+
         for _ in range(10000):
             c = random.choice(self.customers)
 
@@ -104,4 +109,71 @@ class DataStore:
                 price = product["price"]
 
 
+                item_total = price * quantity
+                total_amount += item_total
+                
 
+                self.order_items.append({
+                    "order_item_id": str(uuid.uuid4()),
+                    "order_id": order_id,
+                    "product_id": product["product_id"],
+                    "quantity": quantity,
+                    "price": price,
+                    "total_price": item_total,
+                    "created_at": created.isoformat(),
+                    "updated_at": created.isoformat()
+                })      
+
+
+
+            self.orders.append({
+                "order_id": order_id,
+                "customer_id": c["customer_id"],
+                "total_amount": float(total_amount),
+                "status": status,
+                "payment_method": random.choices(PAYMENT_METHODS, PM_W)[0],
+                "country": c["country"],
+                "created_at": created.isoformat(),
+                "updated_at": created.isoformat()
+            })
+        
+        
+        # ---------------- VISITS ----------------     
+        
+        for _ in range(30000):
+            dt = _rand_date(180)
+
+            if dt.weekday() in (5,6) and random.random() < 0.2:
+                continue
+
+            cust = None
+            if random.random() < 0.35:
+                cust = random.choice(self.customers)["customer_id"]
+                
+            pageviews = max(1, int(random.expovariate(1/2)))
+            duration = int(random.gammavariate(2,45))
+
+            bounced = 1 if (pageviews == 1 and duration < 10) else 0
+
+            conv_prob = (
+                0.02 +
+                (0.02 if random.choice(MEDIUMS) == "cpc" else 0) +
+                (0.03 if random.choice(MEDIUMS) == "email" else 0) +
+                (0.01 if pageviews >= 3 else 0)
+            )
+
+
+            self.visits.append({
+                "visit_id": str(uuid.uuid4()),
+                "customer_id": cust,
+                "source": random.choices(SOURCES, SRC_W)[0],
+                "medium": random.choices(MEDIUMS, MED_W)[0],
+                "device": random.choices(DEVICES, DEV_W)[0],
+                "country": random.choices(COUNTRIES, COUNTRY_W)[0],
+                "pageviews": pageviews,
+                "session_duration_s": duration,
+                "bounced": bounced,
+                "converted": 1 if conv_prob > random.random() else 0,
+                "visit_start": dt.isoformat(),
+                "updated_at": dt.isoformat()
+            })

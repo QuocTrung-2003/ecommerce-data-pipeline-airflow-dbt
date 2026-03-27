@@ -20,6 +20,7 @@ RESOURCE_MAP = {
     "visits": lambda: store.visits,
 }
 
+
 # ---------------- MAIN ENDPOINT ----------------
 @app.get("/customers")
 @app.get("/orders")
@@ -27,3 +28,26 @@ RESOURCE_MAP = {
 @app.get("/products")
 @app.get("/visits")
 def list_resources():
+
+    
+    path = request.path.strip("/")
+    items = RESOURCE_MAP[path]()
+    qs = request.args
+
+
+    # ---------------- FILTER ----------------
+    customer_id = qs.get("customer_id")
+    if customer_id:
+        items = [i for i in items if i.get("customer_id") == customer_id]
+
+    order_id = qs.get("order_id")
+    if order_id:
+        items = [i for i in items if i.get("order_id") == order_id]
+
+    status = qs.get("status")
+    if status and path == "orders":
+        items = [i for i in items if i.get("status") == status]
+
+    country = qs.get("country")
+    if country:
+        items = [i for i in items if i.get("country") == country]

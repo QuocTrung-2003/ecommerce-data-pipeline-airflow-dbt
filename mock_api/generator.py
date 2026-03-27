@@ -84,4 +84,24 @@ class DataStore:
                 "updated_at": signup.isoformat(),
                 "is_churned": random.random() < 0.18
             })
-        
+            
+
+            # ---------------- ORDERS + ORDER ITEMS ----------------
+        for _ in range(10000):
+            c = random.choice(self.customers)
+
+            order_id = str(uuid.uuid4())
+            created = _rand_date(180)
+            status = random.choices(STATUSES, STAT_W)[0]
+
+            total_amount = 0
+            num_items = random.randint(1, 3)
+
+
+            for _ in range(num_items):
+                product = random.choice(self.products)
+                quantity = random.randint(1, 3)
+                price = product["price"]
+
+
+

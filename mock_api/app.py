@@ -26,7 +26,23 @@ def check_rate_limit():
             count = 0
         count += 1
         return count <= RATE
-    
+
+
+
+# ---------------- AUTH ----------------
+def require_auth():
+    auth = request.headers.get("Authorization", "")
+    return auth.startswith("Bearer ") and auth.split(" ",1)[1] == API_KEY
+
+
+# ---------------- CHAOS ----------------
+def maybe_chaos():
+    if random.random() < 0.02:
+        resp = jsonify({"error":"internal_error","id":str(uuid.uuid4())})
+        resp.status_code = 500
+        return resp
+    return None
+
 
 # ---------------- PAGINATION ----------------
 def paginate(items, page, page_size):
@@ -73,7 +89,14 @@ def list_resources():
     if not check_rate_limit():
         return jsonify({"error":"rate_limited","retry_after":30}), 429
     
-    
+
+    if not check_rate_limit():
+        return jsonify({"error":"rate_limited","retry_after":30}), 429
+
+    chaos = maybe_chaos()
+    if chaos:
+        return chaos
+
     path = request.path.strip("/")
     items = RESOURCE_MAP[path]()
     qs = request.args
@@ -102,3 +125,6 @@ def list_resources():
     page_size = min(int(qs.get("page_size", 500)), 1000)
 
     return jsonify(paginate(items, page, page_size))
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=8000)

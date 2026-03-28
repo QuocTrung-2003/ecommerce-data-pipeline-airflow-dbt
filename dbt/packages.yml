@@ -1,0 +1,3 @@
+packages:
+  - package: dbt-labs/dbt_utils    # Widely used helper package for macros and data tests
+    version: [">=1.0.0", "<2.0.0"]  # Keep within v1 range for stability

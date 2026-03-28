@@ -1,0 +1,14 @@
+name: ecommerce_analytics
+version: 1.0.0
+config-version: 2
+profile: api_bi_profile
+model-paths: ["models"]
+
+models:
+  ecommerce_analytics:      # Must match the project name defined above
+    intermediate:           # Applies to models in models/intermediate/
+      +materialized: view   # Build as views for lightweight transformations
+      +schema: intermediate # Store in the intermediate schema
+    marts:                  # Applies to models in models/marts/
+      +materialized: table  # Build as tables for BI performance
+      +schema: analytics    # Store in the analytics schema

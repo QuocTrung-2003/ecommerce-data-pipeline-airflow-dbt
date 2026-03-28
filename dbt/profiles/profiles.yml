@@ -1,0 +1,12 @@
+ecommerce_analytics:
+  target: dev              # Use "dev" config when running dbt
+  outputs:
+    dev:                  # Settings for development environment
+      type: postgres      # Connect to a Postgres database
+      host: postgres      # Where the database is running
+      user: "{{ env_var('POSTGRES_USER') }}"      # Get username from env
+      password: "{{ env_var('POSTGRES_PASSWORD') }}"  # Get password from env
+      port: 5432          # Port to connect
+      dbname: "{{ env_var('POSTGRES_DB') }}"      # Database name
+      schema: ""          # Leave empty → no prefix added to schema names
+      threads: 4          # Run up to 4 models at the same time

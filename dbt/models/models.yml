@@ -1,0 +1,59 @@
+version: 2
+
+models:
+
+  # ---------------- STAGING ----------------
+  - name: stg_customers
+    columns:
+      - name: customer_id
+      - name: country
+
+  - name: stg_products
+    columns:
+      - name: product_id
+      - name: price
+
+  - name: stg_orders
+    columns:
+      - name: order_id
+      - name: customer_id
+      - name: status
+
+  - name: stg_order_items
+    columns:
+      - name: order_item_id
+      - name: order_id
+      - name: product_id
+
+
+  - name: stg_visits
+    columns:
+      - name: visit_id
+      - name: source
+
+
+  # ---------------- MART ----------------
+  - name: dim_customers
+    columns:
+      - name: customer_id
+
+
+  - name: dim_products
+    columns:
+      - name: product_id
+
+
+  - name: fact_orders
+    columns:
+      - name: order_id
+      - name: order_day
+
+
+  - name: fact_order_items
+    columns:
+      - name: order_item_id
+
+  - name: fact_marketing
+    columns:
+      - name: visit_day
+

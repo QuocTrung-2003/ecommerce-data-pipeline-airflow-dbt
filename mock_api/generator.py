@@ -1,38 +1,38 @@
 import uuid, random
 from datetime import datetime, timedelta, timezone
 
-COUNTRIES = ["US","GB","DE","FR","CA","AU","NL","SE","IT","ES"]
-COUNTRY_W = [0.35,0.15,0.12,0.07,0.08,0.06,0.06,0.04,0.04,0.03]
+COUNTRIES = ["VN","TH","SG","MY","ID","PH","JP","KR","IN","CN"]
+COUNTRY_W = [0.3,0.12,0.1,0.08,0.12,0.08,0.06,0.05,0.05,0.04]
 
-INDUSTRIES = ["Retail","Technology","Education","Health","Finance"]
-IND_W = [0.35,0.25,0.12,0.1,0.1]
+INDUSTRIES = ["Fashion","Electronics","Beauty","Home","Sports"]
+IND_W = [0.3,0.25,0.15,0.15,0.15]
 
-PRODUCTS = ["Laptop","Phone","Headphones","Keyboard","Monitor","Mouse"]
-CATEGORIES = ["Electronics","Accessories"]
+PRODUCTS = ["T-shirt","Sneakers","Smartwatch","Blender","Yoga Mat","Backpack"]
+CATEGORIES = ["Clothing","Gadgets","Home Appliances","Fitness","Accessories"]
 
 PRICES = {
-    "Laptop": 1200,
-    "Phone": 800,
-    "Headphones": 150,
-    "Keyboard": 100,
-    "Monitor": 300,
-    "Mouse": 50
+    "T-shirt": 25,
+    "Sneakers": 120,
+    "Smartwatch": 200,
+    "Blender": 90,
+    "Yoga Mat": 40,
+    "Backpack": 60
 }
 
-PAYMENT_METHODS=["card","bank_transfer","paypal","apple_pay","google_pay"]
-PM_W=[0.6,0.15,0.15,0.05,0.05]
+PAYMENT_METHODS = ["credit_card","e_wallet","cod","bank_transfer","buy_now_pay_later"]
+PM_W = [0.4,0.25,0.2,0.1,0.05]
 
-STATUSES = ["completed","cancelled","returned"]
-STAT_W=[0.9,0.06,0.04]
+STATUSES = ["delivered","pending","cancelled","returned"]
+STAT_W = [0.75,0.1,0.1,0.05]
 
-SOURCES=["google","direct","facebook","linkedin","newsletter","referral","bing"]
-SRC_W=[0.45,0.18,0.12,0.08,0.07,0.06,0.04]
+SOURCES = ["tiktok","google","instagram","youtube","affiliate","direct","email"]
+SRC_W = [0.25,0.2,0.15,0.1,0.1,0.1,0.1]
 
-MEDIUMS=["organic","cpc","email","social","none","referral"]
-MED_W=[0.5,0.18,0.1,0.12,0.06,0.04]
+MEDIUMS = ["ads","organic","influencer","email","referral","social"]
+MED_W = [0.3,0.25,0.15,0.1,0.1,0.1]
 
-DEVICES=["desktop","mobile","tablet"]
-DEV_W=[0.55,0.4,0.05]
+DEVICES = ["mobile","desktop","tablet","smart_tv"]
+DEV_W = [0.65,0.25,0.07,0.03]
 
 TZ = timezone.utc
 random.seed(42)

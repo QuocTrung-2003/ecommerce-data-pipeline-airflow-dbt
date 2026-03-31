@@ -4,7 +4,8 @@ from datetime import datetime, timedelta
 from airflow.providers.postgres.hooks.postgres import PostgresHook
 from dateutil import parser
 from airflow import DAG
-
+from airflow.operators.python import PythonOperator
+from airflow.operators.bash import BashOperator
 
 
 API_BASE = os.environ.get("API_BASE_URL", "http://mock-api:8000")
@@ -176,4 +177,68 @@ with DAG(
     tags=["elt", "postgres", "dbt", "bi"],
 )as dag:
     
-    []
+    extract_customers = PythonOperator(
+        task_id="extract_customers",
+        python_callable=extract_api_data,
+        op_kwargs={
+            "table": "raw_data.customers",
+            "endpoint": "customers",
+            "ts_field": "updated_at",
+            "wm_name": "wm_customers",
+        },
+    )
+
+    extract_products = PythonOperator(
+        task_id="extract_products",
+        python_callable=extract_api_data,
+        op_kwargs={
+            "table": "raw_data.products",
+            "endpoint": "products",
+            "ts_field": "updated_at",
+            "wm_name": "wm_products",
+        },
+    )
+
+    extract_orders = PythonOperator(
+        task_id="extract_orders",
+        python_callable=extract_api_data,
+        op_kwargs={
+            "table": "raw_data.orders",
+            "endpoint": "orders",
+            "ts_field": "updated_at",
+            "wm_name": "wm_orders",
+        },
+    )
+
+    extract_order_items = PythonOperator(
+        task_id="extract_order_items",
+        python_callable=extract_api_data,
+        op_kwargs={
+            "table": "raw_data.order_items",
+            "endpoint": "order_items",
+            "ts_field": "updated_at",
+            "wm_name": "wm_order_items",
+        },
+    )
+
+    extract_visits = PythonOperator(
+        task_id="extract_visits",
+        python_callable=extract_api_data,
+        op_kwargs={
+            "table": "raw_data.visits",
+            "endpoint": "visits",
+            "ts_field": "updated_at",
+            "wm_name": "wm_visits",
+        },
+    )
+
+    dbt_deps = BashOperator(
+        task_id="dbt_deps",
+    )
+
+    dbt_build = BashOperator(
+        task_id="dbt_build",
+    )
+
+
+[ extract_customers, extract_products, extract_orders, extract_order_items, extract_visits ] >> dbt_deps >> dbt_build

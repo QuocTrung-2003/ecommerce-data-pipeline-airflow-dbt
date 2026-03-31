@@ -145,8 +145,8 @@ def extract_api_data(table, endpoint, ts_field, wm_name):
                     )
                 elif table == "raw_data.visits":
                     for d in data:
-                        d["bounced"] = int(d.get("bounced", 0))
-                        d["converted"] = int(d.get("converted", 0))
+                        d["bounced"] = int(bool(d.get("bounced")))
+                        d["converted"] = int(bool(d.get("converted")))
 
                     cur.executemany(
                         """
@@ -156,6 +156,7 @@ def extract_api_data(table, endpoint, ts_field, wm_name):
                         """,
                         data
                     )
+                    
         rows += len(data)
         for d in data:
             ts = parser.isoparse(d.get(ts_field))

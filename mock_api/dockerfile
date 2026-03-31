@@ -1,0 +1,38 @@
+# -----------------------------
+# Dockerfile for mock_api
+# -----------------------------
+# 1. Small base image + Python 3.11
+FROM python:3.11-slim-bookworm
+
+# 2. Install necessary tool (curl) & remove cache to reduce image size
+RUN apt-get update \
+    && apt-get upgrade -y \
+    && apt-get install -y --no-install-recommends curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# 3. Set working directory
+WORKDIR /app
+
+# 4. Copy requirements first to leverage Docker layer caching
+COPY requirements.txt .
+
+# 5. Install dependencies without pip cache
+RUN pip install --no-cache-dir -r requirements.txt
+
+# 6. Copy application code
+COPY app.py generator.py ./
+
+# 7. Environment variable
+ENV API_RATE_LIMIT_PER_MIN=300
+
+# 8. Expose container port
+EXPOSE 8000
+
+# 9. Create non-root user and change ownership
+RUN useradd -m appuser && chown -R appuser /app
+USER appuser
+
+# 10. CMD for production-ready server
+#    - Uvicorn runs FastAPI
+#    - 4 workers handle multiple requests concurrently
+CMD ["uvicorn","app:app","--host","0.0.0.0","--port","8000","--workers","4"]

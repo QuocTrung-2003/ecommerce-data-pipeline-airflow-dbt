@@ -1,0 +1,70 @@
+==================== 2026-03-31T10:46:37.005036Z | 019d4380-a2a0-7f52-9af2-61bb19b57873 ====================
+10:46:37.011374 [info ]: Installing dbt project and profile setup
+10:46:37.020832 [info ]: Warning A dbt_project.yml already exists in this directory; skipping sample project creation.
+10:46:37.029756 [info ]: Info Created .vscode/extensions.json with dbt extension recommendation
+10:46:37.047875 [info ]: Info Setting up your profile...
+10:46:37.063626 [info ]: Loading ~/.dbt/profiles.yml
+10:46:37.092733 [info ]: Info Creating new profile...
+10:47:29.206605 [info ]: No dbt_cloud.yml found - proceeding without cloud pre-population
+10:52:08.569478 [info ]: Success Profile written to C:\Users\User\.dbt\profiles.yml
+10:52:08.571384 [info ]: Validating profile inputs, adapters, and connection
+
+10:52:08.572698 [info ]: dbt-fusion 2.0.0-preview.154
+10:52:08.579839 [info ]: Started loading project
+10:52:08.614659 [info ]: Loading ~/.dbt/profiles.yml
+10:52:08.647351 [info ]: Finished loading project [  0.07s]
+10:52:08.652306 [info ]: Started debugging
+10:52:08.653111 [info ]: Debugging profile: dev
+10:52:08.653555 [info ]: Debugging dbt version: 2.0.0-preview.154
+10:52:08.654000 [info ]: Debugging platform: windows x86_64 (windows)
+10:52:08.654851 [info ]: Debugging adapter type: postgres (remote)
+10:52:08.719454 [info ]: Debugging dependencies:
+  git: OK
+10:52:08.726090 [info ]: Debugging connection:
+  "port": 5432,
+  "database": "db",
+  "schema": "raw_data",
+  "host": "127.0.0.1",
+  "user": "db_user"
+10:52:10.653963 [info ]: Finished debugging [  2.00s]
+10:52:10.655991 [error]: dbt1011: dbt was unable to connect to the specified database.
+The following error was returned:
+
+execution error: Error with dynamic library: LoadLibraryExW failed
+
+Check your database credentials and try again. For more information, visit:
+https://docs.getdbt.com/docs/core/connect-data-platform/connection-profiles
+10:52:11.536259 [info ]: New version available 2.0.0-preview.164 (run `dbt system update`)
+10:52:11.909632 [info ]: 
+==================== Execution Summary =====================
+Finished 'init' with 1 error for target 'dev' [5m 35s]
+==================== 2026-03-31T10:54:01.034039Z | 019d4387-6913-77b1-8c69-cb8be74bbb00 ====================
+10:54:01.034513 [info ]: dbt-fusion 2.0.0-preview.154
+10:54:01.036705 [info ]: Started loading project
+10:54:01.047052 [info ]: Loading ~/.dbt/profiles.yml
+10:54:01.050446 [info ]: Finished loading project [  0.01s]
+10:54:01.051045 [info ]: Started debugging
+10:54:01.051478 [info ]: Debugging profile: dev
+10:54:01.052092 [info ]: Debugging dbt version: 2.0.0-preview.154
+10:54:01.052569 [info ]: Debugging platform: windows x86_64 (windows)
+10:54:01.053392 [info ]: Debugging adapter type: postgres (remote)
+10:54:01.119247 [info ]: Debugging dependencies:
+  git: OK
+10:54:01.121176 [info ]: Debugging connection:
+  "port": 5432,
+  "database": "db",
+  "schema": "raw_data",
+  "host": "127.0.0.1",
+  "user": "db_user"
+10:54:03.167361 [info ]: Finished debugging [  2.12s]
+10:54:03.168350 [error]: dbt1011: dbt was unable to connect to the specified database.
+The following error was returned:
+
+execution error: Error with dynamic library: LoadLibraryExW failed
+
+Check your database credentials and try again. For more information, visit:
+https://docs.getdbt.com/docs/core/connect-data-platform/connection-profiles
+10:54:04.057224 [info ]: New version available 2.0.0-preview.164 (run `dbt system update`)
+10:54:04.207520 [info ]: 
+==================== Execution Summary =====================
+Finished 'debug' with 1 error for target 'dev' [3.2s]

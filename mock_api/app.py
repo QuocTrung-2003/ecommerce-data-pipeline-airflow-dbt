@@ -119,7 +119,19 @@ def list_resources():
     if country:
         items = [i for i in items if i.get("country") == country]
 
-
+    # ---------------- INCREMENTAL ----------------
+    updated_since = qs.get("updated_since")
+    if updated_since:
+        ts = parser.isoparse(updated_since)
+        items = [
+            i for i in items
+            if parser.isoparse(
+                i.get("updated_at") or
+                i.get("created_at") or
+                i.get("visit_start")
+            ) >= ts
+        ]
+        
     # ---------------- PAGINATION ----------------
     page = int(qs.get("page", 1))
     page_size = min(int(qs.get("page_size", 500)), 1000)

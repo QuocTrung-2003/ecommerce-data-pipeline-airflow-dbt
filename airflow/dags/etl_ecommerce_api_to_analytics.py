@@ -1,10 +1,14 @@
 import os, time, requests, logging
 from datetime import datetime, timedelta
+from airflow.providers.postgres.hooks.postgres import PostgresHook
 from airflow import DAG
+from airflow.models import Variable
 
 
 API_BASE = os.environ.get("API_BASE_URL", "http://mock-api:8000")
 API_KEY = os.environ["API_KEY"]
+if not API_KEY:
+    raise ValueError("API_KEY is required")
 HEADERS = {"Authorization": f"Bearer {API_KEY}"}
 
 DEFAULT_ARGS = {
@@ -15,6 +19,12 @@ DEFAULT_ARGS = {
     "retry_exponential_backoff": True
     
 }
+
+def _get_watermark(name, default_iso):
+    return Variable.get(name, default_var=default_iso)
+
+def _set_watermark(name, iso):
+    Variable.set(name, iso)
 
 def _fetch_paged(endpoint, params, max_retries=5):
     page = 1
@@ -60,6 +70,10 @@ def _fetch_paged(endpoint, params, max_retries=5):
             page = data["next_page"]
         else:
             return
+        
+def extract_table(table, endpoint, ts_field, wm_name):
+    pg = PostgresHook(postgres_conn_id="postgres_default")
+    iso_default = (datetime.utcnow() - timedelta(days=365)).isoformat() + "Z"
 
 with DAG(
     dag_id="etl_ecommerce_api_to_analytics",

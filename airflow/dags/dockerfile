@@ -1,0 +1,35 @@
+# Base image: Airflow with a fixed version and Python runtime
+FROM apache/airflow:3.1-python3.11
+
+# ----------------------------------------------------------------------
+# Install system dependencies (requires root)
+# ----------------------------------------------------------------------
+USER root
+
+# Install Docker CLI (optional, for DockerOperator or similar use cases)
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends docker.io docker-compose-plugin \
+ && rm -rf /var/lib/apt/lists/*
+
+# ----------------------------------------------------------------------
+# Install Python dependencies
+# ----------------------------------------------------------------------
+
+# Copy requirements early to leverage Docker layer caching
+COPY requirements.txt /requirements.txt
+
+# Switch back to non-root user 
+USER airflow
+
+# Install Python packages using Airflow constraints to avoid conflicts
+RUN export AIRFLOW_CONSTRAINTS_URL="https://raw.githubusercontent.com/apache/airflow/constraints-3.1/constraints-3.11.txt" \
+    # Install PostgreSQL driver (used by Airflow/dbt)
+    && python -m pip install --no-cache-dir psycopg2-binary -c "$AIRFLOW_CONSTRAINTS_URL" \
+    # Install project dependencies under the same constraints
+    && pip install --no-cache-dir -r /requirements.txt -c "$AIRFLOW_CONSTRAINTS_URL"
+
+# ----------------------------------------------------------------------
+# Runtime user
+# ----------------------------------------------------------------------
+# Final user = airflow (container runs as non-root for security)
+USER airflow

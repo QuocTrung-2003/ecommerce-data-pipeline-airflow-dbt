@@ -1,5 +1,5 @@
 # Base image: Airflow with a fixed version and Python runtime
-FROM apache/airflow:3.1-python3.11
+FROM apache/airflow:2.9.3-python3.11
 
 # ----------------------------------------------------------------------
 # Install system dependencies (requires root)
@@ -22,7 +22,7 @@ COPY requirements.txt /requirements.txt
 USER airflow
 
 # Install Python packages using Airflow constraints to avoid conflicts
-RUN export AIRFLOW_CONSTRAINTS_URL="https://raw.githubusercontent.com/apache/airflow/constraints-3.1/constraints-3.11.txt" \
+RUN export AIRFLOW_CONSTRAINTS_URL="https://raw.githubusercontent.com/apache/airflow/constraints-2.9.3/constraints-3.11.txt" \
     # Install PostgreSQL driver (used by Airflow/dbt)
     && python -m pip install --no-cache-dir psycopg2-binary -c "$AIRFLOW_CONSTRAINTS_URL" \
     # Install project dependencies under the same constraints

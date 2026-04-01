@@ -1,4 +1,6 @@
 services:
+#---------------------POSTGRES---------------------#
+
   postgres:
     image: postgres:16
     container_name: postgres
@@ -17,6 +19,7 @@ services:
       timeout: 3s
       retries: 30
 
+#---------------------API---------------------#
 
   mock-api:
     build: ./mock_api
@@ -35,3 +38,78 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+
+#---------------------AIRFLOW---------------------#
+
+  airflow:
+    build: ./airflow
+    image: airflow-local
+    container_name: airflow
+    working_dir: /workspace
+    environment:
+
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+      AIRFLOW__CORE__EXECUTOR: "LocalExecutor"
+      AIRFLOW__WEBSERVER__EXPOSE_CONFIG: "True"
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: >-
+        postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      DBT_PROFILES_DIR: /opt/airflow/.dbt
+      TZ: ${TZ:-UTC}
+      AIRFLOW_CONN_POSTGRES_DEFAULT: >-
+        postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      API_BASE_URL: http://mock-api:8000
+      API_KEY: ${API_KEY:?API_KEY must be set}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    entrypoint: ["/bin/bash"]
+    command:
+      - -lc
+      - |
+          set -euo pipefail
+
+          airflow db init
+          airflow users create --role Admin --username letrung --password letrung123 --firstname Trung --lastname Le --email trungle@example.com || true
+          airflow connections delete postgres_default || true
+          airflow connections add postgres_default --conn-uri "postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}"
+
+          airflow webserver &
+          exec airflow scheduler
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/logs:/opt/airflow/logs
+      - ./airflow/plugins:/opt/airflow/plugins
+      - ./dbt:/usr/app
+      - ./dbt/profiles:/opt/airflow/.dbt
+      - ./:/workspace
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mock-api:
+        condition: service_healthy
+
+#---------------------DBT---------------------#       
+
+  dbt:
+    image: ghcr.io/dbt-labs/dbt-postgres:1.8.latest
+    container_name: dbt
+    working_dir: /usr/app
+    environment:
+      DBT_PROFILES_DIR: /root/.dbt
+      TZ: ${TZ:-UTC}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - ./dbt:/usr/app
+      - ./dbt/profiles:/root/.dbt
+    depends_on:
+      postgres:
+        condition: service_healthy
+    entrypoint: ["/bin/bash", "-lc", "dbt deps && dbt run && tail -f /dev/null"]
+
+volumes:
+  pgdata: {}

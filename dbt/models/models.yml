@@ -26,7 +26,7 @@ models:
       - name: status
         tests:
           - accepted_values:
-              values: [completed, cancelled, returned]
+              values: [delivered, pending, cancelled, returned]
 
   - name: int_order_items
     columns:

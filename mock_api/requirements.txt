@@ -1,3 +1,5 @@
 flask==3.0.3
-python-dateutil==2.9.0.post0  #parse datetime library (parser.isoparse)
-
+python-dateutil==2.9.0.post0
+# python-dateutil dùng để parse datetime (parser.isoparse)
+uvicorn==0.42.0
+asgiref==3.11.0

@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify
 from dateutil import parser
 import os, time, random, uuid, threading
 from generator import DataStore
-
+from asgiref.wsgi import WsgiToAsgi
 
 API_KEY = os.environ["API_KEY"]
 RATE = int(os.environ.get("API_RATE_LIMIT_PER_MIN", "60"))
@@ -76,6 +76,7 @@ RESOURCE_MAP = {
 def health():
     return {"status": "ok"}
 
+asgi_app = WsgiToAsgi(app)
 
 # ---------------- MAIN ENDPOINT ----------------
 @app.get("/customers")

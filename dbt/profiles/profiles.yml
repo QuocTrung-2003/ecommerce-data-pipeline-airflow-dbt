@@ -1,4 +1,4 @@
-ecommerce_analytics:
+api_bi_profile:
   target: dev              # Use "dev" config when running dbt
   outputs:
     dev:                  # Settings for development environment
@@ -8,5 +8,5 @@ ecommerce_analytics:
       password: "{{ env_var('POSTGRES_PASSWORD') }}"  # Get password from env
       port: 5432          # Port to connect
       dbname: "{{ env_var('POSTGRES_DB') }}"      # Database name
-      schema: ""          # Leave empty → no prefix added to schema names
+      schema: "analytics"          # prefix added to schema names - do not emty
       threads: 4          # Run up to 4 models at the same time

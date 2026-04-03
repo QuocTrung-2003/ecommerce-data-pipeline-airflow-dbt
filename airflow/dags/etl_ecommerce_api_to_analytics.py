@@ -172,7 +172,7 @@ with DAG(
     dag_id="etl_ecommerce_api_to_analytics",
     default_args=DEFAULT_ARGS,
     start_date=datetime(2026, 1, 1),
-    schedule=None,
+    schedule="*/5 * * * *",
     catchup=False,
     max_active_runs=1,
     tags=["elt", "postgres", "dbt", "bi"],
@@ -235,10 +235,18 @@ with DAG(
 
     dbt_deps = BashOperator(
         task_id="dbt_deps",
+        bash_command=(
+            "docker exec dbt bash -lc "
+            "'cd /usr/app && dbt deps --profiles-dir /root/.dbt'"
+        ),
     )
 
     dbt_build = BashOperator(
         task_id="dbt_build",
+        bash_command=(
+            "docker exec dbt bash -lc "
+            "'cd /usr/app && dbt build --fail-fast --profiles-dir /root/.dbt'"
+        ),
     )
 
 

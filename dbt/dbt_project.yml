@@ -4,8 +4,10 @@ config-version: 2
 profile: api_bi_profile
 model-paths: ["models"]
 
+packages-install-path: /tmp/dbt_packages
+
 models:
-  ecommerce_analytics:      # Must match the project name defined above
+  api_bi_profile:      # Must match the project name defined above
     intermediate:           # Applies to models in models/intermediate/
       +materialized: view   # Build as views for lightweight transformations
       +schema: intermediate # Store in the intermediate schema

@@ -1,10 +1,24 @@
+{# stg_visits.sql #}
+
 {{ config(
-    materialized='incremental',
-    unique_key='visit_id'
+    materialized='table'
 ) }}
 
 with src as (
     select * from {{ source('stg_raw', 'visits') }}
+),
+
+deduped as (
+    select *
+    from (
+        select *,
+            row_number() over (
+                partition by visit_id
+                order by updated_at desc
+            ) as rn
+        from src
+    ) t
+    where rn = 1
 ),
 
 cleaned as (
@@ -34,7 +48,7 @@ cleaned as (
 
         date_trunc('day', visit_start)::date as visit_day
 
-    from src
+    from deduped
 ),
 
 valid as (
@@ -42,18 +56,6 @@ valid as (
     from cleaned
     where visit_id is not null
       and updated_at is not null
-),
-
-final as (
-    select *
-    from valid
-
-    {% if is_incremental() %}
-    where updated_at > (
-        select coalesce(max(updated_at), '1900-01-01')
-        from {{ this }}
-    )
-    {% endif %}
 )
 
-select * from final
+select * from valid

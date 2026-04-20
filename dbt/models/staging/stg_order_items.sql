@@ -1,10 +1,23 @@
+{# stg_order_items.sql #}
+
 {{ config(
-    materialized='incremental',
-    unique_key='order_item_id'
+    materialized='table'
 ) }}
 
 with src as (
     select * from {{ source('stg_raw', 'order_items') }}
+),
+deduped as (
+    select *
+    from (
+        select *,
+            row_number() over (
+                partition by order_item_id
+                order by updated_at desc
+            ) as rn
+        from src
+    ) t
+    where rn = 1
 ),
 
 cleaned as (
@@ -21,7 +34,7 @@ cleaned as (
         created_at::timestamp as created_at,
         updated_at::timestamp as updated_at
 
-    from src
+    from deduped
 ),
 
 valid as (
@@ -33,18 +46,7 @@ valid as (
       and quantity is not null
       and price is not null
       and updated_at is not null
-),
-
-final as (
-    select *
-    from valid
-
-    {% if is_incremental() %}
-    where updated_at > (
-        select coalesce(max(updated_at), '1900-01-01')
-        from {{ this }}
-    )
-    {% endif %}
 )
 
-select * from final
+
+select * from valid

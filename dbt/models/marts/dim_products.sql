@@ -1,11 +1,12 @@
-with p as (
-  select * from {{ ref('int_products') }}
-)
+{{ config(
+    materialized='table'
+) }}
 
 select
-  product_id,
-  product_name,
-  category,
-  price,
-  currency
-from p
+    product_id,
+    product_name,
+    category,
+    price,
+    currency
+
+from {{ ref('stg_products') }}

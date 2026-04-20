@@ -1,7 +1,7 @@
 version: 2
 
 sources:
-  - name: raw_data
+  - name: stg_raw
     tables:
       - name: customers
       - name: orders

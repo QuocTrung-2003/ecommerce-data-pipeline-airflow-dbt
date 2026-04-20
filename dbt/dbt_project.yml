@@ -7,10 +7,10 @@ model-paths: ["models"]
 packages-install-path: /tmp/dbt_packages
 
 models:
-  api_bi_profile:      # Must match the project name defined above
+  ecommerce_analytics:      # Must match the project name defined above
     intermediate:           # Applies to models in models/intermediate/
       +materialized: view   # Build as views for lightweight transformations
-      +schema: intermediate # Store in the intermediate schema
+      +schema: intermediate           # Store in the intermediate schema
     marts:                  # Applies to models in models/marts/
       +materialized: table  # Build as tables for BI performance
-      +schema: analytics    # Store in the analytics schema
+      +schema: marts        # Store in the analytics schema

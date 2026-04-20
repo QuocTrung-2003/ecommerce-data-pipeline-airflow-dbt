@@ -4,21 +4,46 @@
 ) }}
 
 with src as (
-    select * from {{ source('raw_data', 'products') }}
+    select * from {{ source('stg_raw', 'products') }}
+),
+
+cleaned as (
+    select
+        product_id,
+
+        -- text normalization
+        trim(product_name) as product_name,
+        lower(trim(category)) as category,
+
+        -- numeric safety
+        price::numeric as price,
+
+        -- currency standardization
+        upper(trim(currency)) as currency,
+
+        updated_at::timestamp as updated_at
+
+    from src
+),
+
+valid as (
+    select *
+    from cleaned
+    where product_id is not null
+      and product_name is not null
+      and price is not null
+      and updated_at is not null
 ),
 
 final as (
-    select
-        product_id,
-        product_name,
-        category,
-        price::numeric as price,
-        currency,
-        updated_at::timestamp as updated_at
-    from src
+    select *
+    from valid
 
     {% if is_incremental() %}
-    where updated_at > (select max(updated_at) from {{ this }})
+    where updated_at > (
+        select coalesce(max(updated_at), '1900-01-01')
+        from {{ this }}
+    )
     {% endif %}
 )
 

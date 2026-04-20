@@ -2,6 +2,7 @@ __pycache__/
 *.pyc
 
 dbt_packages/
-
+.env
 logs/
 target/
+serects/

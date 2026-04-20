@@ -88,10 +88,10 @@ def extract_api_data(table, endpoint, ts_field, wm_name):
             continue
         with pg.get_conn() as conn:
             with conn.cursor() as cur:
-                if table == "raw_data.customers":
+                if table == "stg_raw.customers":
                     cur.executemany(
                         """
-                        INSERT INTO raw_data.customers(customer_id,company_name,country,industry,company_size,signup_date,updated_at,is_churned)
+                        INSERT INTO stg_raw.customers(customer_id,company_name,country,industry,company_size,signup_date,updated_at,is_churned)
                         VALUES(%(customer_id)s,%(company_name)s,%(country)s,%(industry)s,%(company_size)s,%(signup_date)s,%(updated_at)s,%(is_churned)s)
                         ON CONFLICT (customer_id) DO UPDATE SET
                           company_name=EXCLUDED.company_name,
@@ -104,10 +104,10 @@ def extract_api_data(table, endpoint, ts_field, wm_name):
                         """,
                         data
                     )
-                elif table == "raw_data.products":
+                elif table == "stg_raw.products":
                     cur.executemany(
                         """
-                        INSERT INTO raw_data.products(product_id,product_name,category,price,currency,updated_at)
+                        INSERT INTO stg_raw.products(product_id,product_name,category,price,currency,updated_at)
                         VALUES(%(product_id)s,%(product_name)s,%(category)s,%(price)s,%(currency)s,%(updated_at)s)
                         ON CONFLICT (product_id) DO UPDATE SET
                         product_name=EXCLUDED.product_name,
@@ -118,10 +118,10 @@ def extract_api_data(table, endpoint, ts_field, wm_name):
                         """,
                         data
                     )
-                elif table == "raw_data.orders":
+                elif table == "stg_raw.orders":
                     cur.executemany(
                         """
-                        INSERT INTO raw_data.orders(order_id,customer_id,total_amount,status,payment_method,country,created_at,updated_at)
+                        INSERT INTO stg_raw.orders(order_id,customer_id,total_amount,status,payment_method,country,created_at,updated_at)
                         VALUES(%(order_id)s,%(customer_id)s,%(total_amount)s,%(status)s,%(payment_method)s,%(country)s,%(created_at)s,%(updated_at)s)
                         ON CONFLICT (order_id) DO UPDATE SET
                         customer_id=EXCLUDED.customer_id,
@@ -134,23 +134,23 @@ def extract_api_data(table, endpoint, ts_field, wm_name):
                         """,
                         data
                     )
-                elif table == "raw_data.order_items":
+                elif table == "stg_raw.order_items":
                     cur.executemany(
                         """
-                        INSERT INTO raw_data.order_items(order_item_id,order_id,product_id,quantity,price,total_price,created_at,updated_at)
+                        INSERT INTO stg_raw.order_items(order_item_id,order_id,product_id,quantity,price,total_price,created_at,updated_at)
                         VALUES(%(order_item_id)s,%(order_id)s,%(product_id)s,%(quantity)s,%(price)s,%(total_price)s,%(created_at)s,%(updated_at)s)
                         ON CONFLICT (order_item_id) DO NOTHING
                         """,
                         data
                     )
-                elif table == "raw_data.visits":
+                elif table == "stg_raw.visits":
                     for d in data:
                         d["bounced"] = int(bool(d.get("bounced")))
                         d["converted"] = int(bool(d.get("converted")))
 
                     cur.executemany(
                         """
-                        INSERT INTO raw_data.visits(visit_id,customer_id,source,medium,device,country,pageviews,session_duration_s,bounced,converted,visit_start,updated_at)
+                        INSERT INTO stg_raw.visits(visit_id,customer_id,source,medium,device,country,pageviews,session_duration_s,bounced,converted,visit_start,updated_at)
                         VALUES(%(visit_id)s,%(customer_id)s,%(source)s,%(medium)s,%(device)s,%(country)s,%(pageviews)s,%(session_duration_s)s,%(bounced)s,%(converted)s,%(visit_start)s,%(updated_at)s)
                         ON CONFLICT (visit_id) DO NOTHING
                         """,
@@ -182,7 +182,7 @@ with DAG(
         task_id="extract_customers",
         python_callable=extract_api_data,
         op_kwargs={
-            "table": "raw_data.customers",
+            "table": "stg_raw.customers",
             "endpoint": "customers",
             "ts_field": "updated_at",
             "wm_name": "wm_customers",
@@ -193,7 +193,7 @@ with DAG(
         task_id="extract_products",
         python_callable=extract_api_data,
         op_kwargs={
-            "table": "raw_data.products",
+            "table": "stg_raw.products",
             "endpoint": "products",
             "ts_field": "updated_at",
             "wm_name": "wm_products",
@@ -204,7 +204,7 @@ with DAG(
         task_id="extract_orders",
         python_callable=extract_api_data,
         op_kwargs={
-            "table": "raw_data.orders",
+            "table": "stg_raw.orders",
             "endpoint": "orders",
             "ts_field": "updated_at",
             "wm_name": "wm_orders",
@@ -215,7 +215,7 @@ with DAG(
         task_id="extract_order_items",
         python_callable=extract_api_data,
         op_kwargs={
-            "table": "raw_data.order_items",
+            "table": "stg_raw.order_items",
             "endpoint": "order_items",
             "ts_field": "updated_at",
             "wm_name": "wm_order_items",
@@ -226,7 +226,7 @@ with DAG(
         task_id="extract_visits",
         python_callable=extract_api_data,
         op_kwargs={
-            "table": "raw_data.visits",
+            "table": "stg_raw.visits",
             "endpoint": "visits",
             "ts_field": "updated_at",
             "wm_name": "wm_visits",

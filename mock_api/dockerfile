@@ -1,3 +1,4 @@
+# ecommerce-data-pipeline-airflow-dbt\mock_api\Dockerfile
 # -----------------------------
 # Dockerfile for mock_api
 # -----------------------------
@@ -6,7 +7,6 @@ FROM python:3.11-slim-bookworm
 
 # 2. Install necessary tool (curl) & remove cache to reduce image size
 RUN apt-get update \
-    && apt-get upgrade -y \
     && apt-get install -y --no-install-recommends curl \
     && rm -rf /var/lib/apt/lists/*
 
@@ -20,7 +20,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # 6. Copy application code
-COPY app.py generator.py ./
+COPY . .
 
 # 7. Environment variable
 ENV API_RATE_LIMIT_PER_MIN=300
@@ -35,4 +35,4 @@ USER appuser
 # 10. CMD for production-ready server
 #    - Uvicorn runs FastAPI
 #    - 4 workers handle multiple requests concurrently
-CMD ["uvicorn","app:asgi_app","--host","0.0.0.0","--port","8000","--workers","4"]
+CMD ["uvicorn","main:app","--host","0.0.0.0","--port","8000","--workers","4"]

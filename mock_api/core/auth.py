@@ -1,3 +1,4 @@
+# ecommerce-data-pipeline-airflow-dbt/mock_api/core/auth.py
 import os
 from fastapi import Request, HTTPException
 from core.config import API_KEY

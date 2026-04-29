@@ -1,12 +1,11 @@
-from dotenv import load_dotenv
-from pathlib import Path
+# ecommerce-data-pipeline-airflow-dbt/mock_api/core/config.py
+# from dotenv import load_dotenv
 import os
 
-BASE_DIR = Path(__file__).resolve().parent
+# load_dotenv()
 
-load_dotenv(BASE_DIR / ".env.app")
+API_KEY = os.getenv("API_KEY")   # ✅ THIẾU DÒNG NÀY
 
-API_KEY = os.getenv("API_KEY")
 RATE_LIMIT = int(os.getenv("API_RATE_LIMIT_PER_MIN", "60"))
 TZ = os.getenv("TZ", "UTC")
 

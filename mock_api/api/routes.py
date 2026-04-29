@@ -1,3 +1,4 @@
+# ecommerce-data-pipeline-airflow-dbt/mock_api/api/routes.py
 from fastapi import APIRouter, Request, HTTPException
 from core.auth import require_auth
 from core.rate_limit import check_rate_limit
@@ -7,14 +8,25 @@ from utils.pagination import paginate
 
 router = APIRouter()
 
-@router.get("/{resource}")
-def list_resources(resource: str, request: Request):
+ALLOWED_FACTS = {"orders", "visits"}
+ALLOWED_DIMS = {"customers", "products", "order_items"}
 
-    # validate
-    if resource not in ["customers","orders","order_items","products","visits"]:
+def safe_int(v, default):
+    try:
+        return int(v)
+    except:
+        return default
+
+
+# ---------------------------
+# RAW DATA ACCESS (restricted)
+# ---------------------------
+@router.get("/data/{resource}")
+def raw_resource(resource: str, request: Request):
+
+    if resource not in ALLOWED_FACTS | ALLOWED_DIMS:
         raise HTTPException(status_code=404, detail="Not found")
 
-    # middleware-like logic
     if not check_rate_limit():
         raise HTTPException(status_code=429, detail="rate_limited")
 
@@ -22,10 +34,65 @@ def list_resources(resource: str, request: Request):
     maybe_chaos()
 
     qs = dict(request.query_params)
-
     items = get_data(resource, qs)
 
-    page = int(qs.get("page", 1))
-    page_size = min(int(qs.get("page_size", 500)), 1000)
+    return {
+        "count": len(items),
+        "data": items[:1000]   # safety cap
+    }
 
-    return paginate(items, page, page_size)
+
+# ---------------------------
+# OLAP KPI ENDPOINT
+# ---------------------------
+@router.get("/analytics/kpi")
+def kpi(request: Request):
+
+    qs = dict(request.query_params)
+    orders = get_data("orders", qs)
+
+    revenue = sum(o["total_amount"] for o in orders)
+    count_orders = len(orders)
+    aov = revenue / count_orders if count_orders else 0
+
+    return {
+        "revenue": revenue,
+        "orders": count_orders,
+        "aov": round(aov, 2)
+    }
+
+
+# ---------------------------
+# TIME SERIES (BI CORE)
+# ---------------------------
+@router.get("/analytics/revenue/daily")
+def revenue_daily(request: Request):
+
+    qs = dict(request.query_params)
+    orders = get_data("orders", qs)
+
+    result = {}
+
+    for o in orders:
+        day = o["created_at"][:10]
+        result[day] = result.get(day, 0) + o["total_amount"]
+
+    return result
+
+
+# ---------------------------
+# FUNNEL SIMULATION (OLAP STYLE)
+# ---------------------------
+@router.get("/analytics/funnel")
+def funnel(request: Request):
+
+    qs = dict(request.query_params)
+
+    visits = get_data("visits", qs)
+    orders = get_data("orders", qs)
+
+    return {
+        "visits": len(visits),
+        "orders": len(orders),
+        "conversion_rate": len(orders) / len(visits) if visits else 0
+    }

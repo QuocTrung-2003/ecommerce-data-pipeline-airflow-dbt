@@ -1,3 +1,4 @@
+# ecommerce-data-pipeline-airflow-dbt/utils/pagination.py
 def paginate(items, page, page_size):
     total = len(items)
     total_pages = (total + page_size - 1) // page_size

@@ -3,6 +3,8 @@ __pycache__/
 
 dbt_packages/
 .env
+.env.app
+.env.airflow
 logs/
 target/
 serects/

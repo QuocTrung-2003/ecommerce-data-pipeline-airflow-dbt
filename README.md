@@ -74,7 +74,7 @@ The architecture follows a modern data stack approach:
 - Permissions managed separately via SQL  
 
 ## 🚀 Getting Started
-*(Thêm hướng dẫn cài đặt chi tiết nếu cần)*
+
 
 ## 📈 Future Improvements
 - Add data quality checks (dbt tests)  

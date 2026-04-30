@@ -20,10 +20,8 @@ select
 
     l.customer_status,
     l.customer_segment,
-    l.customer_age_days,
-    l.revenue,
-    l.total_orders
-
+    l.customer_age_days
 from c
 left join lifecycle l
     on c.customer_id = l.customer_id
+{# dim_customers.sql #}

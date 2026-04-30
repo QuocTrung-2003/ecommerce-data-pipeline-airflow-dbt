@@ -11,6 +11,7 @@ select
     customer_id,
     order_day,
     status,
+    payment_method,
 
     -- KPI CORE
     case
@@ -19,10 +20,10 @@ select
     end as revenue,
 
     total_amount,
-    payment_method,
 
     -- business flags
     case when status = 'cancelled' then 1 else 0 end as is_cancelled,
     case when status = 'returned' then 1 else 0 end as is_returned
 
 from orders
+{# fact_orders.sql #}

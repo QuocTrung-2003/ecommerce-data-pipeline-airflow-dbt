@@ -10,3 +10,4 @@ select
     currency
 
 from {{ ref('stg_products') }}
+{# dim_products.sql #}

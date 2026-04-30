@@ -21,10 +21,12 @@ select
 
     case
         when converted = true then 1 else 0
-    end as conversions,
+    end as is_conversions,
 
     case
         when bounced = true then 1 else 0
-    end as bounces
+    end as is_bounces
 
 from sessions
+
+{# fact_marketing.sql #}

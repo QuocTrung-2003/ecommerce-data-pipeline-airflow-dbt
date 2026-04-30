@@ -17,11 +17,8 @@ select
     price,
     total_price,
 
-    case
-        when order_status = 'delivered' then total_price
-        else 0
-    end as net_revenue,
-
+    order_status,
     order_day
 
 from items
+{# fact_order_items.sql #}

@@ -1,10 +1,5 @@
-<<<<<<< Updated upstream
-import os, time, requests, logging
-from airflow.models import Variable
-=======
 # ecommerce-data-pipeline-airflow-dbt\airflow\dags\etl_ecommerce_api_to_analytics.py
 
->>>>>>> Stashed changes
 from datetime import datetime, timedelta
 from airflow import DAG
 from airflow.operators.python import PythonOperator
